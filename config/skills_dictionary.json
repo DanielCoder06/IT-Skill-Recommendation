@@ -1,0 +1,58 @@
+{
+  "Python": {
+    "category": "programming_language",
+    "aliases": ["python", "python3", "py"]
+  },
+  "Java": {
+    "category": "programming_language",
+    "aliases": ["java"]
+  },
+  "JavaScript": {
+    "category": "programming_language",
+    "aliases": ["javascript", "js"]
+  },
+  "SQL": {
+    "category": "database",
+    "aliases": ["sql"]
+  },
+  "MySQL": {
+    "category": "database",
+    "aliases": ["mysql"]
+  },
+  "PostgreSQL": {
+    "category": "database",
+    "aliases": ["postgresql", "postgres"]
+  },
+  "Git": {
+    "category": "tool",
+    "aliases": ["git"]
+  },
+  "GitHub": {
+    "category": "tool",
+    "aliases": ["github"]
+  },
+  "Docker": {
+    "category": "tool",
+    "aliases": ["docker"]
+  },
+  "Machine Learning": {
+    "category": "ai_ml",
+    "aliases": ["machine learning", "ml"]
+  },
+  "Deep Learning": {
+    "category": "ai_ml",
+    "aliases": ["deep learning", "dl"]
+  },
+  "English": {
+    "category": "language",
+    "aliases": ["english", "tiếng anh"]
+  },
+  "Communication": {
+    "category": "soft_skill",
+    "aliases": ["communication", "communication skills", "kỹ năng giao tiếp"]
+  },
+  "Teamwork": {
+    "category": "soft_skill",
+    "aliases": ["teamwork", "team work", "làm việc nhóm"]
+  }
+}
