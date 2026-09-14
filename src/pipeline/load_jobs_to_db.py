@@ -8,7 +8,7 @@ jobs =  load_jobs()
 print("Số lượng jobs: ", len(jobs))
 
 for job in jobs:
-    """Process each job"""
+    # Process each job
     company_name = job["company"]
     
     result = connection.execute(
@@ -30,7 +30,6 @@ for job in jobs:
             """,
             (company_name,)
         )
-        connection.commit()
         
         company_id = connection.execute(
             """
@@ -46,7 +45,7 @@ for job in jobs:
         
     print(company_name, "->", company_id)
     
-    """Process each location"""
+    # """Process each location"""
     location_city = job["location"]
     
     result = connection.execute(
@@ -68,8 +67,6 @@ for job in jobs:
             (location_city,)
         )
         
-        connection.commit()
-        
         location_id = connection.execute(
             """ 
             SELECT id
@@ -77,11 +74,36 @@ for job in jobs:
             WHERE city = ?
             """,
             (location_city,)
-        ).fetchall()[0]
+        ).fetchone()[0]
     
     else:
         location_id = location[0]
         
     print(location_city, "->", location_id)
-
+    
+    # """INSERT INTO jobs"""
+    connection.execute(
+        """
+        INSERT OR IGNORE INTO jobs (
+            id,
+            title,
+            company_id,
+            location_id,
+            jd_raw,
+            job_url,
+            experience
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            job["id"],  
+            job["title"],
+            company_id,
+            location_id,
+            job["description"],
+            job["url"],
+            job["experience"]
+        )
+    )
+connection.commit()
 connection.close()
