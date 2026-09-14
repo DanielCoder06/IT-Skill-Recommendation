@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 DICTIONARY_PATH = BASE_DIR / "config" / "skills_dictionary.json"
@@ -11,6 +11,8 @@ def load_skills_dictionary() -> dict:
         return json.load(file)
 
 class GeminiSkillOutput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    
     skills: list[str]
     
     @field_validator("skills")

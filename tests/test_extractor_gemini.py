@@ -41,3 +41,10 @@ def test_unknown_skill_is_rejected():
         GeminiSkillOutput(
             skills=["Python", "SQL", "Quantum Computing"]
         )
+        
+def test_extra_field_is_rejected():
+    with pytest.raises(ValidationError):
+        GeminiSkillOutput(
+            skills=["Python"],
+            reason="Some explanation"
+        )
