@@ -1,58 +1,235 @@
 {
   "Python": {
-    "category": "programming_language",
-    "aliases": ["python", "python3", "py"]
+    "category": "Programming Language",
+    "aliases": [
+      "python",
+      "python programming",
+      "python developer",
+      "lập trình python"
+    ]
   },
+
   "Java": {
-    "category": "programming_language",
-    "aliases": ["java"]
+    "category": "Programming Language",
+    "aliases": ["java", "java programming", "lập trình java"]
   },
+
   "JavaScript": {
-    "category": "programming_language",
-    "aliases": ["javascript", "js"]
+    "category": "Programming Language",
+    "aliases": [
+      "javascript",
+      "javascript programming",
+      "js",
+      "lập trình javascript"
+    ]
   },
+
   "SQL": {
-    "category": "database",
-    "aliases": ["sql"]
+    "category": "Database",
+    "aliases": [
+      "sql",
+      "sql database",
+      "sql databases",
+      "structured query language"
+    ]
   },
+
   "MySQL": {
-    "category": "database",
-    "aliases": ["mysql"]
+    "category": "Database",
+    "aliases": ["mysql", "mysql database"]
   },
+
   "PostgreSQL": {
-    "category": "database",
-    "aliases": ["postgresql", "postgres"]
+    "category": "Database",
+    "aliases": ["postgresql", "postgres", "postgres database"]
   },
+
   "Git": {
-    "category": "tool",
-    "aliases": ["git"]
+    "category": "Version Control",
+    "aliases": ["git", "version control"]
   },
+
   "GitHub": {
-    "category": "tool",
-    "aliases": ["github"]
+    "category": "Version Control",
+    "aliases": ["github", "git hub"]
   },
-  "Docker": {
-    "category": "tool",
-    "aliases": ["docker"]
+
+  "Pandas": {
+    "category": "Data Science",
+    "aliases": ["pandas", "python pandas"]
   },
+
+  "NumPy": {
+    "category": "Data Science",
+    "aliases": ["numpy", "numpy library", "python numpy"]
+  },
+
+  "Microsoft Excel": {
+    "category": "Data Analysis",
+    "aliases": ["excel", "microsoft excel", "ms excel"]
+  },
+
   "Machine Learning": {
-    "category": "ai_ml",
-    "aliases": ["machine learning", "ml"]
+    "category": "Machine Learning",
+    "aliases": ["machine learning", "machine-learning", "ml", "học máy"]
   },
+
   "Deep Learning": {
-    "category": "ai_ml",
-    "aliases": ["deep learning", "dl"]
+    "category": "Machine Learning",
+    "aliases": ["deep learning", "deep-learning", "dl", "học sâu"]
   },
+
+  "Artificial Intelligence": {
+    "category": "Artificial Intelligence",
+    "aliases": ["artificial intelligence", "ai", "a.i.", "trí tuệ nhân tạo"]
+  },
+
+  "Scikit-learn": {
+    "category": "Machine Learning",
+    "aliases": ["scikit-learn", "scikit learn", "sklearn"]
+  },
+
+  "TensorFlow": {
+    "category": "Deep Learning",
+    "aliases": ["tensorflow", "tensor flow"]
+  },
+
+  "PyTorch": {
+    "category": "Deep Learning",
+    "aliases": ["pytorch", "py torch"]
+  },
+
+  "REST API": {
+    "category": "Backend",
+    "aliases": ["rest api", "restful api", "rest", "api"]
+  },
+
+  "HTML": {
+    "category": "Frontend",
+    "aliases": ["html", "html5", "hypertext markup language"]
+  },
+
+  "CSS": {
+    "category": "Frontend",
+    "aliases": ["css", "css3", "cascading style sheets"]
+  },
+
+  "React": {
+    "category": "Frontend",
+    "aliases": ["react", "react.js", "reactjs", "react js"]
+  },
+
+  "Vue.js": {
+    "category": "Frontend",
+    "aliases": ["vue", "vue.js", "vuejs", "vue js"]
+  },
+
+  "Node.js": {
+    "category": "Backend",
+    "aliases": ["node", "node.js", "nodejs", "node js"]
+  },
+
+  "Docker": {
+    "category": "DevOps",
+    "aliases": ["docker", "docker container", "containers"]
+  },
+
+  "Linux": {
+    "category": "Operating System",
+    "aliases": ["linux", "linux operating system", "ubuntu"]
+  },
+
+  "AWS": {
+    "category": "Cloud",
+    "aliases": ["aws", "amazon web services"]
+  },
+
+  "Microsoft Azure": {
+    "category": "Cloud",
+    "aliases": ["azure", "microsoft azure"]
+  },
+
+  "CI/CD": {
+    "category": "DevOps",
+    "aliases": [
+      "ci/cd",
+      "ci cd",
+      "continuous integration",
+      "continuous delivery",
+      "continuous deployment"
+    ]
+  },
+
+  "Bash": {
+    "category": "Programming Language",
+    "aliases": ["bash", "bash scripting", "shell scripting", "shell script"]
+  },
+
+  "Object-Oriented Programming": {
+    "category": "Programming Concept",
+    "aliases": [
+      "object-oriented programming",
+      "object oriented programming",
+      "oop",
+      "lập trình hướng đối tượng"
+    ]
+  },
+
+  "Statistics": {
+    "category": "Data Science",
+    "aliases": ["statistics", "statistical analysis", "thống kê"]
+  },
+
+  "Data Visualization": {
+    "category": "Data Science",
+    "aliases": [
+      "data visualization",
+      "data visualisation",
+      "data viz",
+      "trực quan hóa dữ liệu"
+    ]
+  },
+
   "English": {
-    "category": "language",
-    "aliases": ["english", "tiếng anh"]
+    "category": "Language",
+    "aliases": [
+      "english",
+      "english communication",
+      "english reading",
+      "tiếng anh",
+      "giao tiếp tiếng anh"
+    ]
   },
+
   "Communication": {
-    "category": "soft_skill",
-    "aliases": ["communication", "communication skills", "kỹ năng giao tiếp"]
+    "category": "Soft Skill",
+    "aliases": [
+      "communication",
+      "communication skills",
+      "good communication",
+      "kỹ năng giao tiếp",
+      "giao tiếp"
+    ]
   },
+
   "Teamwork": {
-    "category": "soft_skill",
-    "aliases": ["teamwork", "team work", "làm việc nhóm"]
+    "category": "Soft Skill",
+    "aliases": [
+      "teamwork",
+      "team work",
+      "team player",
+      "team collaboration",
+      "làm việc nhóm"
+    ]
+  },
+
+  "Problem Solving": {
+    "category": "Soft Skill",
+    "aliases": [
+      "problem solving",
+      "problem-solving",
+      "problem solving skills",
+      "giải quyết vấn đề"
+    ]
   }
 }

@@ -15,10 +15,10 @@ def load_skills_dictionary():
         return json.load(file)
 
 
-def extract_skills(jd_text: str) -> list[str]:
+def extract_skills(jd_text: str) -> set[str]:
     skills_dictionary = load_skills_dictionary()
 
-    found_skills = []
+    found_skills = set()
 
     for skill_name, skill_info in skills_dictionary.items():
 
@@ -27,13 +27,13 @@ def extract_skills(jd_text: str) -> list[str]:
             pattern = rf"\b{re.escape(alias)}\b"
 
             if re.search(pattern, jd_text, re.IGNORECASE):
-                found_skills.append(skill_name)
+                found_skills.add(skill_name)
                 break
 
     return found_skills
 
 
-def save_job_skills(job_id: int, skill_names: list[str]):
+def save_job_skills(job_id: int, skill_names: set[str]):
     connection = sqlite3.connect(DB_PATH)
 
     connection.execute("PRAGMA foreign_keys = ON")

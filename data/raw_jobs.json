@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "title": "Python Intern",
+    "company": "FPT Software",
+    "description": "Tuyển Intern Python Developer.\n\nYêu cầu:\n- Biết Python và SQL\n- Sử dụng Git và GitHub\n- Có kiến thức về Machine Learning\n- Có khả năng giao tiếp tiếng Anh\n- Làm việc nhóm tốt",
+    "location": "Cần Thơ",
+    "url": "https://example.com/python-intern-001",
+    "experience": "Dưới 1 năm"
+  },
+  {
+    "id": 2,
+    "title": "Data Analyst Intern",
+    "company": "ABC Technology",
+    "description": "We are looking for a Data Analyst Intern.\n\nRequirements:\n- Knowledge of Python programming\n- Experience with SQL databases\n- Basic knowledge of Pandas and NumPy\n- Familiarity with Microsoft Excel\n- Good communication skills",
+    "location": "Hồ Chí Minh",
+    "url": "https://example.com/data-analyst-intern-002",
+    "experience": "Không yêu cầu"
+  },
+  {
+    "id": 3,
+    "title": "Backend Developer Intern",
+    "company": "XYZ Tech",
+    "description": "Backend Developer Intern needed.\n\nRequirements:\n- Strong Python programming skills\n- Knowledge of REST API\n- Experience with PostgreSQL or MySQL\n- Familiarity with Git\n- Understanding of Object-Oriented Programming (OOP)",
+    "location": "Hà Nội",
+    "url": "https://example.com/backend-intern-003",
+    "experience": "0-1 years"
+  },
+  {
+    "id": 4,
+    "title": "Machine Learning Intern",
+    "company": "AI Solutions",
+    "description": "Công ty đang tìm kiếm Machine Learning Intern.\n\nYêu cầu:\n- Python programming\n- Có kiến thức về ML và Deep Learning\n- Biết sử dụng Scikit-learn\n- Có kiến thức về NumPy, Pandas\n- Hiểu cơ bản về TensorFlow hoặc PyTorch",
+    "location": "Đà Nẵng",
+    "url": "https://example.com/ml-intern-004",
+    "experience": "Dưới 1 năm"
+  },
+  {
+    "id": 5,
+    "title": "Frontend Developer Intern",
+    "company": "Web Solutions",
+    "description": "We are hiring a Frontend Developer Intern.\n\nRequirements:\n- HTML and CSS knowledge\n- JavaScript programming\n- Experience with React.js is a plus\n- Familiarity with Git and GitHub\n- Basic understanding of REST APIs",
+    "location": "Hồ Chí Minh",
+    "url": "https://example.com/frontend-intern-005",
+    "experience": "No experience required"
+  },
+  {
+    "id": 6,
+    "title": "AI Engineer Intern",
+    "company": "VietAI",
+    "description": "Tuyển AI Engineer Intern.\n\nYêu cầu:\n- Thành thạo Python\n- Có kiến thức về Artificial Intelligence (AI)\n- Machine Learning và Deep Learning\n- Biết xử lý dữ liệu với Pandas\n- Có kinh nghiệm sử dụng PyTorch\n- Biết Git là một lợi thế",
+    "location": "Cần Thơ",
+    "url": "https://example.com/ai-engineer-intern-006",
+    "experience": "0-1 năm"
+  },
+  {
+    "id": 7,
+    "title": "Software Engineer Intern",
+    "company": "Global Tech",
+    "description": "We are seeking a Software Engineer Intern to join our development team.\n\nRequired skills:\n- Java or Python\n- SQL\n- Git\n- Object Oriented Programming\n- Problem solving\n- Teamwork and communication",
+    "location": "Hà Nội",
+    "url": "https://example.com/software-engineer-intern-007",
+    "experience": "Less than 1 year"
+  },
+  {
+    "id": 8,
+    "title": "Data Science Intern",
+    "company": "DataLab",
+    "description": "Cơ hội thực tập Data Science dành cho sinh viên ngành Công nghệ thông tin.\n\nYêu cầu:\n- Python\n- Pandas và NumPy\n- Statistics\n- Machine Learning\n- Data Visualization\n- SQL\n\nEnglish communication is required.",
+    "location": "Cần Thơ",
+    "url": "https://example.com/data-science-intern-008",
+    "experience": "Không yêu cầu kinh nghiệm"
+  },
+  {
+    "id": 9,
+    "title": "DevOps Intern",
+    "company": "Cloud Systems",
+    "description": "We are looking for a DevOps Intern.\n\nRequirements:\n- Basic Linux knowledge\n- Git and GitHub\n- Docker\n- CI/CD concepts\n- Familiarity with AWS or Azure\n- Basic knowledge of Python or Bash scripting",
+    "location": "Hồ Chí Minh",
+    "url": "https://example.com/devops-intern-009",
+    "experience": "0-1 years"
+  },
+  {
+    "id": 10,
+    "title": "Full Stack Developer Intern",
+    "company": "NextGen Software",
+    "description": "Tuyển Full Stack Developer Intern.\n\nYêu cầu:\n- HTML, CSS, JavaScript\n- React hoặc Vue.js\n- Python hoặc Node.js\n- REST API\n- SQL / MySQL\n- Git và GitHub\n- Có khả năng làm việc nhóm\n\nCandidates should have basic English reading skills.",
+    "location": "Đà Nẵng",
+    "url": "https://example.com/fullstack-intern-010",
+    "experience": "Dưới 1 năm"
+  }
+]
