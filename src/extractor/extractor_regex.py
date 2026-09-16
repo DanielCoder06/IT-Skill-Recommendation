@@ -33,13 +33,14 @@ def extract_skills(jd_text: str) -> set[str]:
     return found_skills
 
 
-def save_job_skills(job_id: int, skill_names: set[str]):
+def save_job_skills(
+    job_id: int,
+    skill_sources: dict[str, str],
+):
     connection = sqlite3.connect(DB_PATH)
-
     connection.execute("PRAGMA foreign_keys = ON")
 
-    for skill_name in skill_names:
-
+    for skill_name, source in skill_sources.items():
         result = connection.execute(
             """
             SELECT id
@@ -58,16 +59,17 @@ def save_job_skills(job_id: int, skill_names: set[str]):
 
         connection.execute(
             """
-            INSERT OR IGNORE INTO job_skills
+            INSERT INTO job_skills
             (job_id, skill_id, source)
             VALUES (?, ?, ?)
+            ON CONFLICT(job_id, skill_id)
+            DO UPDATE SET source = excluded.source
             """,
-            (job_id, skill_id, "regex")
+            (job_id, skill_id, source)
         )
 
     connection.commit()
     connection.close()
-
 
 if __name__ == "__main__":
 
