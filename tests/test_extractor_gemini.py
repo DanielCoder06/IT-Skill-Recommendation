@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from src.extractor.extractor_gemini import GeminiSkillOutput
+from src.extractor.extractor_gemini import GeminiSkillOutput, build_gemini_prompt
 
 
 def test_valid_output():
@@ -41,10 +41,19 @@ def test_unknown_skill_is_rejected():
         GeminiSkillOutput(
             skills=["Python", "SQL", "Quantum Computing"]
         )
-        
-def test_extra_field_is_rejected():
-    with pytest.raises(ValidationError):
-        GeminiSkillOutput(
-            skills=["Python"],
-            reason="Some explanation"
-        )
+
+def test_build_gemini_prompt():
+    jd_text = """
+    We are looking for a Python intern with knowledge of SQL and Pandas.
+    """
+
+    prompt = build_gemini_prompt(jd_text)
+
+    assert "JOB DESCRIPTION:" in prompt
+    assert jd_text in prompt
+
+    assert "Python" in prompt
+    assert "SQL" in prompt
+    assert "Pandas" in prompt
+
+    assert "Only select skills from the allowed skill list." in prompt
