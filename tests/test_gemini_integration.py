@@ -1,5 +1,9 @@
+import pytest
+
 from src.extractor.extractor_gemini import extract_skills_with_gemini
 
+
+@pytest.mark.integration
 def test_extract_skills_with_gemini():
     jd_text = """
     We are looking for a Python Intern.
