@@ -18,3 +18,9 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+# Dataset
+data/external/
+
+# Generated processed datasets
+data/processed/

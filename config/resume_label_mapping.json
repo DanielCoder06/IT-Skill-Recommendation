@@ -1,0 +1,38 @@
+{
+  "word": "Microsoft Word",
+  "windows": "Windows",
+  "ms office": "Microsoft Office",
+  "microsoft office": "Microsoft Office",
+
+  "equipment": "REMOVE",
+  "internet": "REMOVE",
+  "control": "REMOVE",
+  "technology": "REMOVE",
+  "learning": "REMOVE",
+  "skill": "REMOVE",
+
+  "tools": "REMOVE",
+  "problems": "REMOVE",
+  "phone": "REMOVE",
+  "review": "REMOVE",
+  "technical skills": "REMOVE",
+  "electronics": "REMOVE",
+  "solutions": "REMOVE",
+  "music": "REMOVE",
+  "proficiency": "REMOVE",
+  "expertise": "REMOVE",
+  "type": "REMOVE",
+
+  "testing": "REVIEW",
+  "data": "REVIEW",
+  "development": "REVIEW",
+  "software": "REVIEW",
+  "administration": "REVIEW",
+  "applications": "REVIEW",
+  "cad": "REVIEW",
+  "security": "REVIEW",
+  "network": "REVIEW",
+  "processing": "REVIEW",
+  "troubleshooting": "REVIEW",
+  "developing": "REVIEW"
+}
