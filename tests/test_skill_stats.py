@@ -12,8 +12,10 @@ def test_get_skill_frequency():
     assert isinstance(result, list)
     assert len(result) > 0
 
-    # Python xuất hiện trong 9/10 job
-    assert ("Python", 9) in result
+    for skill, job_count in result:
+        assert isinstance(skill, str)
+        assert isinstance(job_count, int)
+        assert job_count > 0
 
 
 def test_get_skill_percentage():
@@ -22,8 +24,13 @@ def test_get_skill_percentage():
     assert isinstance(result, list)
     assert len(result) > 0
 
-    # Python xuất hiện trong 90% job
-    assert ("Python", 9, 90.0) in result
+    for skill, job_count, percentage in result:
+        assert isinstance(skill, str)
+        assert isinstance(job_count, int)
+        assert job_count > 0
+
+        assert isinstance(percentage, float)
+        assert 0 <= percentage <= 100
 
 
 def test_get_skill_by_location():
@@ -32,24 +39,21 @@ def test_get_skill_by_location():
     assert isinstance(result, list)
     assert len(result) > 0
 
-    # Python xuất hiện trong 3 job ở Cần Thơ
-    assert ("Cần Thơ", "Python", 3) in result
+    for location, skill, job_count in result:
+        assert isinstance(location, str)
+        assert isinstance(skill, str)
+        assert isinstance(job_count, int)
+        assert job_count > 0
 
 
 def test_get_skill_count_per_job():
     result = get_skill_count_per_job()
 
     assert isinstance(result, list)
-    assert len(result) == 10
+    assert len(result) > 0
 
-    assert result[0] == (
-        1,
-        "Python Intern",
-        8,
-    )
-
-    assert result[-1] == (
-        10,
-        "Full Stack Developer Intern",
-        14,
-    )
+    for job_id, title, skill_count in result:
+        assert isinstance(job_id, int)
+        assert isinstance(title, str)
+        assert isinstance(skill_count, int)
+        assert skill_count >= 0

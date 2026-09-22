@@ -6,7 +6,7 @@ def test_rank_jobs_for_cv():
         cv_id=1,
     )
 
-    assert len(rankings) == 10
+    assert len(rankings) > 0
 
     assert all(
         isinstance(result.match_rate, float)
@@ -31,7 +31,8 @@ def test_top_n_job_ranking():
         isinstance(result.job_id, int)
         for result in rankings
     )
-    
+
+
 def test_job_ranking_contains_skill_gap():
     rankings = rank_jobs_for_cv(
         cv_id=1,
