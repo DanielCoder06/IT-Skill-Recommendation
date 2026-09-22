@@ -1,109 +1,148 @@
-from src.pipeline.load_jobs import load_jobs
 import sqlite3
 
-connection = sqlite3.connect("data/it_jobs.db")
+from src.pipeline.load_jobs import load_jobs
 
-jobs =  load_jobs()
 
-print("Số lượng jobs: ", len(jobs))
+DB_PATH = "data/it_jobs.db"
 
-for job in jobs:
-    # Process each job
-    company_name = job["company"]
-    
+
+def get_or_create_company(
+    connection: sqlite3.Connection,
+    company_name: str,
+) -> int:
     result = connection.execute(
-    """
-    SELECT id
-    FROM companies
-    WHERE name = ?
-    """,
-    (company_name,)
+        """
+        SELECT id
+        FROM companies
+        WHERE name = ?
+        """,
+        (company_name,),
     )
-    
-    company_id = result.fetchone()
-    
-    if company_id is None:
-        connection.execute(
-            """
-            INSERT INTO companies (name)
-            VALUES (?)
-            """,
-            (company_name,)
-        )
-        
-        company_id = connection.execute(
-            """
-            SELECT id
-            FROM companies
-            WHERE name = ?
-            """,
-            (company_name,)
-        ).fetchone()[0]
 
-    else:
-        company_id = company_id[0]
-        
-    print(company_name, "->", company_id)
-    
-    # """Process each location"""
-    location_city = job["location"]
-    
+    company = result.fetchone()
+
+    if company is not None:
+        return company[0]
+
+    cursor = connection.execute(
+        """
+        INSERT INTO companies (name)
+        VALUES (?)
+        """,
+        (company_name,),
+    )
+
+    return cursor.lastrowid
+
+
+def get_or_create_location(
+    connection: sqlite3.Connection,
+    city: str,
+) -> int:
     result = connection.execute(
         """
         SELECT id
         FROM locations
         WHERE city = ?
         """,
-        (location_city,)
+        (city,),
     )
+
     location = result.fetchone()
-    
-    if location is None:
-        connection.execute(
-            """ 
-            INSERT INTO locations (city)
-            VALUES (?)
-            """,
-            (location_city,)
-        )
-        
-        location_id = connection.execute(
-            """ 
-            SELECT id
-            FROM locations
-            WHERE city = ?
-            """,
-            (location_city,)
-        ).fetchone()[0]
-    
-    else:
-        location_id = location[0]
-        
-    print(location_city, "->", location_id)
-    
-    # """INSERT INTO jobs"""
-    connection.execute(
+
+    if location is not None:
+        return location[0]
+
+    cursor = connection.execute(
         """
-        INSERT OR IGNORE INTO jobs (
-            id,
-            title,
-            company_id,
-            location_id,
-            jd_raw,
-            job_url,
-            experience
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO locations (city)
+        VALUES (?)
         """,
-        (
-            job["id"],  
-            job["title"],
-            company_id,
-            location_id,
-            job["description"],
-            job["url"],
-            job["experience"]
-        )
+        (city,),
     )
-connection.commit()
-connection.close()
+
+    return cursor.lastrowid
+
+
+def load_jobs_to_db() -> None:
+    connection = sqlite3.connect(DB_PATH)
+
+    jobs = load_jobs()
+
+    print("Số lượng jobs:", len(jobs))
+
+    for job in jobs:
+        company_id = get_or_create_company(
+            connection,
+            job["company"],
+        )
+
+        location_id = get_or_create_location(
+            connection,
+            job["location"],
+        )
+
+        existing_job = connection.execute(
+            """
+            SELECT id
+            FROM jobs
+            WHERE job_url = ?
+            """,
+            (job["url"],),
+        ).fetchone()
+
+        if existing_job is None:
+            connection.execute(
+                """
+                INSERT INTO jobs (
+                    title,
+                    company_id,
+                    location_id,
+                    jd_raw,
+                    job_url,
+                    experience
+                )
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    job["title"],
+                    company_id,
+                    location_id,
+                    job["description"],
+                    job["url"],
+                    job["experience"],
+                ),
+            )
+
+            print("INSERT:", job["title"])
+
+        else:
+            connection.execute(
+                """
+                UPDATE jobs
+                SET
+                    title = ?,
+                    company_id = ?,
+                    location_id = ?,
+                    jd_raw = ?,
+                    experience = ?
+                WHERE job_url = ?
+                """,
+                (
+                    job["title"],
+                    company_id,
+                    location_id,
+                    job["description"],
+                    job["experience"],
+                    job["url"],
+                ),
+            )
+
+            print("UPDATE:", job["title"])
+
+    connection.commit()
+    connection.close()
+
+
+if __name__ == "__main__":
+    load_jobs_to_db()
