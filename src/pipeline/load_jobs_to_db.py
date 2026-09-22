@@ -1,6 +1,7 @@
 import sqlite3
 
 from src.pipeline.load_jobs import load_jobs
+from src.scraper.job_schema import JobRecord
 
 
 DB_PATH = "data/it_jobs.db"
@@ -64,22 +65,22 @@ def get_or_create_location(
     return cursor.lastrowid
 
 
-def load_jobs_to_db() -> None:
+def save_jobs_to_db(
+    jobs: list[JobRecord],
+) -> None:
     connection = sqlite3.connect(DB_PATH)
-
-    jobs = load_jobs()
 
     print("Số lượng jobs:", len(jobs))
 
     for job in jobs:
         company_id = get_or_create_company(
             connection,
-            job["company"],
+            job.company,
         )
 
         location_id = get_or_create_location(
             connection,
-            job["location"],
+            job.location,
         )
 
         existing_job = connection.execute(
@@ -88,7 +89,7 @@ def load_jobs_to_db() -> None:
             FROM jobs
             WHERE job_url = ?
             """,
-            (job["url"],),
+            (job.url,),
         ).fetchone()
 
         if existing_job is None:
@@ -105,16 +106,16 @@ def load_jobs_to_db() -> None:
                 VALUES (?, ?, ?, ?, ?, ?)
                 """,
                 (
-                    job["title"],
+                    job.title,
                     company_id,
                     location_id,
-                    job["description"],
-                    job["url"],
-                    job["experience"],
+                    job.description,
+                    job.url,
+                    job.experience,
                 ),
             )
 
-            print("INSERT:", job["title"])
+            print("INSERT:", job.title)
 
         else:
             connection.execute(
@@ -129,19 +130,37 @@ def load_jobs_to_db() -> None:
                 WHERE job_url = ?
                 """,
                 (
-                    job["title"],
+                    job.title,
                     company_id,
                     location_id,
-                    job["description"],
-                    job["experience"],
-                    job["url"],
+                    job.description,
+                    job.experience,
+                    job.url,
                 ),
             )
 
-            print("UPDATE:", job["title"])
+            print("UPDATE:", job.title)
 
     connection.commit()
     connection.close()
+
+
+def load_jobs_to_db() -> None:
+    raw_jobs = load_jobs()
+
+    jobs = [
+        JobRecord(
+            title=job["title"],
+            company=job["company"],
+            description=job["description"],
+            location=job["location"],
+            url=job["url"],
+            experience=job["experience"],
+        )
+        for job in raw_jobs
+    ]
+
+    save_jobs_to_db(jobs)
 
 
 if __name__ == "__main__":
