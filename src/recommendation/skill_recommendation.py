@@ -61,3 +61,13 @@ def recommend_skills(missing_skills: set[str]) -> list[SkillRecommendation]:
         recommendations.append(recommendation)
 
     return recommendations
+
+def recommend_missing_skills_for_job(
+    missing_skills: set[str],
+) -> list[SkillRecommendation]:
+    """
+    Recommend missing skills based on their demand across jobs.
+    """
+    return recommend_skills(
+        missing_skills=missing_skills,
+    )
