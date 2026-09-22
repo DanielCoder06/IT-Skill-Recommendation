@@ -2,6 +2,7 @@ import sqlite3
 
 from src.pipeline.load_jobs import load_jobs
 from src.scraper.job_schema import JobRecord
+from src.scraper.job_classifier import classify_job_level
 
 
 DB_PATH = "data/it_jobs.db"
@@ -73,6 +74,7 @@ def save_jobs_to_db(
     print("Số lượng jobs:", len(jobs))
 
     for job in jobs:
+        level = classify_job_level(job)
         company_id = get_or_create_company(
             connection,
             job.company,
@@ -101,9 +103,10 @@ def save_jobs_to_db(
                     location_id,
                     jd_raw,
                     job_url,
-                    experience
+                    experience,
+                    level
                 )
-                VALUES (?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     job.title,
@@ -112,6 +115,7 @@ def save_jobs_to_db(
                     job.description,
                     job.url,
                     job.experience,
+                    level,
                 ),
             )
 
@@ -126,7 +130,8 @@ def save_jobs_to_db(
                     company_id = ?,
                     location_id = ?,
                     jd_raw = ?,
-                    experience = ?
+                    experience = ?,
+                    level = ?
                 WHERE job_url = ?
                 """,
                 (
@@ -135,6 +140,7 @@ def save_jobs_to_db(
                     location_id,
                     job.description,
                     job.experience,
+                    level,
                     job.url,
                 ),
             )

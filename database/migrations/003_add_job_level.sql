@@ -1,0 +1,2 @@
+ALTER TABLE jobs
+ADD COLUMN level TEXT NOT NULL DEFAULT 'unspecified';
