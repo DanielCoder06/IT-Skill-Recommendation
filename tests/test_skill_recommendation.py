@@ -1,4 +1,7 @@
-from src.recommendation.skill_recommendation import recommend_skills
+from src.recommendation.skill_recommendation import (
+    get_analyzed_target_job_ids,
+    recommend_skills,
+)
 
 
 def test_recommend_skills_normal_case():
@@ -57,3 +60,55 @@ def test_recommend_skills_order():
         for i in range(len(results) - 1)
         if results[i].job_count == results[i + 1].job_count
     )
+    
+def test_get_analyzed_target_job_ids():
+    job_ids = get_analyzed_target_job_ids()
+
+    assert job_ids
+    assert len(job_ids) == 10
+
+
+def test_recommend_skills_uses_analyzed_target_jobs():
+    recommendations = recommend_skills(
+        missing_skills={
+            "Python",
+            "Git",
+            "SQL",
+        }
+    )
+
+    assert recommendations
+
+    for recommendation in recommendations:
+        assert recommendation.skill in {
+            "Python",
+            "Git",
+            "SQL",
+        }
+
+        assert recommendation.job_count <= 10
+        assert 0 <= recommendation.job_percentage <= 100
+
+
+def test_recommend_skills_percentage_uses_ten_jobs():
+    recommendations = recommend_skills(
+        missing_skills={
+            "Python",
+        }
+    )
+
+    assert len(recommendations) == 1
+
+    recommendation = recommendations[0]
+
+    assert recommendation.skill == "Python"
+    assert recommendation.job_count == 9
+    assert recommendation.job_percentage == 90.0
+
+
+def test_recommend_skills_empty_input():
+    recommendations = recommend_skills(
+        missing_skills=set(),
+    )
+
+    assert recommendations == []
