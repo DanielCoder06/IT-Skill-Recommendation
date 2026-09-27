@@ -58,7 +58,7 @@ def build_learning_roadmap(
 
         prerequisites = get_prerequisites(skill)
 
-        for prerequisite in prerequisites:
+        for prerequisite in sorted(prerequisites):
             visit(prerequisite, level + 1)
 
         visited.add(skill)
@@ -69,7 +69,7 @@ def build_learning_roadmap(
             )
         )
 
-    for skill in target_skills:
+    for skill in sorted(target_skills):
         visit(skill, 0)
 
     return ordered_skills
