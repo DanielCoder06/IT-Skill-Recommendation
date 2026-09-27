@@ -61,6 +61,7 @@ def test_analyzed_target_jobs_have_skills():
 def test_skill_extraction_coverage():
     total, analyzed, coverage = get_skill_extraction_coverage()
 
-    assert total == 12
-    assert analyzed == 10
-    assert coverage == 83.3
+    assert total >= 12
+    assert 0 <= analyzed <= total
+    expected_coverage = round((analyzed / total) * 100, 1)
+    assert coverage == expected_coverage

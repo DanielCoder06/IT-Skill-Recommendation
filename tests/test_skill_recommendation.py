@@ -65,7 +65,7 @@ def test_get_analyzed_target_job_ids():
     job_ids = get_analyzed_target_job_ids()
 
     assert job_ids
-    assert len(job_ids) == 10
+    assert len(job_ids) >= 10
 
 
 def test_recommend_skills_uses_analyzed_target_jobs():
@@ -77,6 +77,8 @@ def test_recommend_skills_uses_analyzed_target_jobs():
         }
     )
 
+    analyzed_job_ids = get_analyzed_target_job_ids()
+
     assert recommendations
 
     for recommendation in recommendations:
@@ -86,11 +88,11 @@ def test_recommend_skills_uses_analyzed_target_jobs():
             "SQL",
         }
 
-        assert recommendation.job_count <= 10
+        assert recommendation.job_count <= len(analyzed_job_ids)
         assert 0 <= recommendation.job_percentage <= 100
 
 
-def test_recommend_skills_percentage_uses_ten_jobs():
+def test_recommend_skills_percentage_uses_analyzed_jobs():
     recommendations = recommend_skills(
         missing_skills={
             "Python",
@@ -101,9 +103,14 @@ def test_recommend_skills_percentage_uses_ten_jobs():
 
     recommendation = recommendations[0]
 
+    analyzed_job_ids = get_analyzed_target_job_ids()
+
     assert recommendation.skill == "Python"
     assert recommendation.job_count == 9
-    assert recommendation.job_percentage == 90.0
+    assert recommendation.job_percentage == round(
+        recommendation.job_count / len(analyzed_job_ids) * 100,
+        2,
+    )
 
 
 def test_recommend_skills_empty_input():

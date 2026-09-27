@@ -231,5 +231,45 @@
       "problem solving skills",
       "giải quyết vấn đề"
     ]
+  },
+
+  "Swift": {
+    "category": "Programming Language",
+    "aliases": ["swift", "swift programming", "swift language"]
+  },
+
+  "Kotlin": {
+    "category": "Programming Language",
+    "aliases": ["kotlin", "kotlin programming", "kotlin language"]
+  },
+
+  "Xcode": {
+    "category": "Development Tool",
+    "aliases": ["xcode", "xcode ide"]
+  },
+
+  "SwiftUI": {
+    "category": "Framework",
+    "aliases": ["swiftui", "swift ui"]
+  },
+
+  "UIKit": {
+    "category": "Framework",
+    "aliases": ["uikit", "ui kit"]
+  },
+
+  "GraphQL": {
+    "category": "API Technology",
+    "aliases": ["graphql", "graphql api"]
+  },
+
+  "XCTest": {
+    "category": "Testing",
+    "aliases": ["xctest", "xctest framework"]
+  },
+
+  "GitLab CI": {
+    "category": "CI/CD",
+    "aliases": ["gitlab ci", "gitlab-ci", "gitlab continuous integration"]
   }
 }
