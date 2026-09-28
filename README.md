@@ -255,17 +255,14 @@ Learning Roadmap
 
 ---
 
-# Next Development
-
 ## Phase 17 — CV PDF/Text Extraction
 
-- Cho phép người dùng cung cấp CV dưới dạng PDF hoặc text.
-- Trích xuất text từ PDF.
-- Sử dụng PyMuPDF cho PDF có text layer.
-- Xử lý trường hợp PDF scan bằng OCR khi cần thiết.
-- Làm sạch CV text.
-- Trích xuất skills từ CV.
-- Xây dựng CV skill profile từ CV được upload.
+- Added TXT text extraction.
+- Added PDF text extraction using PyMuPDF.
+- Added document dispatcher supporting `.pdf` and `.txt`.
+- Added unit tests for extraction and error handling.
+- Added PyMuPDF to project dependencies.
+- Full test suite: 122 passed.
 
 ## Phase 18 — CV Upload → Recommendation
 

@@ -70,16 +70,13 @@ def get_target_job_ids() -> list[int]:
     return job_ids
 
 
-def rank_jobs_for_cv(
-    cv_id: int,
+def rank_jobs_for_cv_skills(
+    cv_skills: set[str],
     top_n: int | None = None,
 ) -> list[JobRankingResult]:
     """
-    Xếp hạng các IT internship dựa trên mức độ phù hợp với một CV.
+    Xếp hạng các IT internship dựa trực tiếp trên tập skills của CV.
     """
-
-    profile = get_cv_profile(cv_id)
-    cv_skills = set(profile["skills"])
 
     job_ids = get_target_job_ids()
 
@@ -111,3 +108,21 @@ def rank_jobs_for_cv(
         rankings = rankings[:top_n]
 
     return rankings
+
+
+def rank_jobs_for_cv(
+    cv_id: int,
+    top_n: int | None = None,
+) -> list[JobRankingResult]:
+    """
+    Xếp hạng các IT internship dựa trên mức độ phù hợp với một CV
+    đã có trong database.
+    """
+
+    profile = get_cv_profile(cv_id)
+    cv_skills = set(profile["skills"])
+
+    return rank_jobs_for_cv_skills(
+        cv_skills=cv_skills,
+        top_n=top_n,
+    )

@@ -49,7 +49,7 @@ def test_build_gemini_prompt():
 
     prompt = build_gemini_prompt(jd_text)
 
-    assert "JOB DESCRIPTION:" in prompt
+    assert "DOCUMENT:" in prompt
     assert jd_text in prompt
 
     assert "Python" in prompt

@@ -1,7 +1,19 @@
 from dataclasses import dataclass
-from src.recommendation.job_ranking import JobRankingResult, rank_jobs_for_cv
-from src.recommendation.learning_roadmap import LearningStep, build_learning_roadmap
-from src.recommendation.skill_recommendation import SkillRecommendation, recommend_skills
+
+from src.recommendation.job_ranking import (
+    JobRankingResult,
+    rank_jobs_for_cv,
+    rank_jobs_for_cv_skills,
+)
+from src.recommendation.learning_roadmap import (
+    LearningStep,
+    build_learning_roadmap,
+)
+from src.recommendation.skill_recommendation import (
+    SkillRecommendation,
+    recommend_skills,
+)
+
 
 @dataclass
 class JobRecommendationResult:
@@ -13,6 +25,7 @@ class JobRecommendationResult:
     extra_skills: set[str]
     recommendations: list[SkillRecommendation]
     learning_roadmap: list[LearningStep]
+
 
 def recommend_for_job_result(
     job_result: JobRankingResult,
@@ -41,15 +54,49 @@ def recommend_for_job_result(
         learning_roadmap=learning_roadmap,
     )
 
+
+def recommend_for_cv_skills(
+    cv_skills: set[str],
+    top_n: int | None = None,
+) -> list[JobRecommendationResult]:
+    """
+    Tạo recommendation từ tập skills của CV.
+
+    Flow:
+        CV Skills
+        -> Job Ranking
+        -> Skill Recommendation
+        -> Learning Roadmap
+    """
+
+    rankings = rank_jobs_for_cv_skills(
+        cv_skills=cv_skills,
+        top_n=top_n,
+    )
+
+    recommendations = []
+
+    for job_result in rankings:
+        recommendation = recommend_for_job_result(
+            job_result=job_result,
+        )
+
+        recommendations.append(recommendation)
+
+    return recommendations
+
+
 def recommend_for_cv(
     cv_id: int,
     top_n: int | None = None,
 ) -> list[JobRecommendationResult]:
     """
-    Tạo recommendation end-to-end cho một CV.
+    Tạo recommendation end-to-end cho một CV
+    đã có trong database.
 
     Flow:
-        CV
+        CV ID
+        -> CV Profile
         -> Job Ranking
         -> Skill Recommendation
         -> Learning Roadmap

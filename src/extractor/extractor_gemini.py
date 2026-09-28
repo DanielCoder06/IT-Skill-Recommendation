@@ -49,15 +49,15 @@ def create_gemini_client():
 
     return genai.Client(api_key=api_key)
 
-def build_gemini_prompt(jd_text: str) -> str:
+def build_gemini_prompt(text: str) -> str:
     skills_dictionary = load_skills_dictionary()
     
     allowed_skills = "\n".join(skills_dictionary.keys())
     
     prompt = f"""
-    You are an IT job skill extraction system.
+    You are an IT skill extraction system.
 
-    Extract the technical and professional skills from the job description.
+    Extract the technical and professional skills from the provided document.
 
     IMPORTANT RULES:
     - Only select skills from the allowed skill list.
@@ -68,15 +68,15 @@ def build_gemini_prompt(jd_text: str) -> str:
     ALLOWED SKILLS:
     {allowed_skills}
 
-    JOB DESCRIPTION:
-    {jd_text}
+    DOCUMENT:
+    {text}
     """
 
     return prompt
 
-def extract_skills_with_gemini(jd_text: str) -> GeminiSkillOutput:
+def extract_skills_with_gemini(text: str) -> GeminiSkillOutput:
     client = create_gemini_client()
-    prompt = build_gemini_prompt(jd_text)
+    prompt = build_gemini_prompt(text)
     interaction = client.interactions.create(
     model="gemini-3.6-flash",
     input=prompt,
