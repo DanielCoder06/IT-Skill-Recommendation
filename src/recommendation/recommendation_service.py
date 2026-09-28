@@ -7,6 +7,7 @@ from src.recommendation.evaluation import (
 from src.recommendation.job_ranking import (
     JobRankingResult,
     rank_jobs_for_cv,
+    rank_jobs_for_cv_skills,
 )
 from src.recommendation.learning_roadmap import (
     LearningStep,
@@ -47,6 +48,18 @@ class RecommendationService:
         """
         return rank_jobs_for_cv(
             cv_id=cv_id,
+            top_n=top_n,
+        )
+    def rank_jobs_by_skills(
+        self,
+        cv_skills: set[str],
+        top_n: int | None = None,
+    ) -> list[JobRankingResult]:
+        """
+        Xếp hạng IT internship dựa trực tiếp trên skills của CV.
+        """
+        return rank_jobs_for_cv_skills(
+            cv_skills=cv_skills,
             top_n=top_n,
         )
 
@@ -98,6 +111,30 @@ class RecommendationService:
         """
         rankings = self.rank_jobs(
             cv_id=cv_id,
+            top_n=top_n,
+        )
+
+        return [
+            self.build_recommendation(job_result)
+            for job_result in rankings
+        ]
+
+    def recommend_from_skills(
+        self,
+        cv_skills: set[str],
+        top_n: int | None = None,
+    ) -> list[RecommendationServiceResult]:
+        """
+        Chạy recommendation pipeline trực tiếp từ CV skills.
+
+        Flow:
+            CV Skills
+            -> Job Ranking
+            -> Skill Recommendation
+            -> Evaluation
+        """
+        rankings = self.rank_jobs_by_skills(
+            cv_skills=cv_skills,
             top_n=top_n,
         )
 

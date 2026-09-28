@@ -89,6 +89,9 @@ Ví dụ:
 
 `Python → NumPy → Pandas → Machine Learning → Deep Learning → PyTorch`
 
+> Learning Roadmap hiện được giữ trong backend như một hướng mở rộng.
+> Chức năng này chưa được hiển thị trong Streamlit UI hiện tại.
+
 ## Phase 9 — Resume Dataset & CV Skill Analysis
 
 - Tích hợp dataset `Annotated_NER_PDF_Resumes`.
@@ -176,8 +179,10 @@ Ví dụ:
 - Hiển thị Matched Skills.
 - Hiển thị Missing Skills.
 - Hiển thị Skill Recommendations.
-- Hiển thị Learning Roadmap.
 - Hoàn thành demo end-to-end từ CV skill profile → Job Recommendation.
+
+> Learning Roadmap đã được triển khai ở backend nhưng không còn được
+> hiển thị trong UI hiện tại và được giữ lại như Future Work.
 
 ## Phase 16 — Testing & Validation
 
@@ -187,73 +192,7 @@ Ví dụ:
 - Kiểm thử Recommendation.
 - Kiểm thử API.
 - Kiểm thử các trường hợp edge case.
-- Full test suite hiện tại:
-
-`112 passed, 1 deselected, 1 warning`
-
-- Warning hiện tại liên quan đến deprecation giữa Starlette TestClient và httpx và chưa ảnh hưởng đến chức năng chính.
-
----
-
-# Current Status
-
-## Đã hoàn thành
-
-- Database
-- Job Data Pipeline
-- Regex Skill Extraction
-- Gemini Skill Extraction
-- Hybrid Skill Extraction Pipeline
-- Skill Extraction Evaluation
-- Skill Analytics
-- Skill Gap Analysis
-- Skill Prerequisite
-- Learning Roadmap
-- Resume Dataset Profiling
-- CV Skill Profile
-- CV → Job Matching
-- Job Ranking
-- Skill Demand Analysis
-- Skill Recommendation
-- End-to-End Recommendation Pipeline
-- Recommendation Evaluation
-- Recommendation Service
-- Job Data Acquisition
-- Arbeitnow Integration
-- FastAPI
-- Streamlit Demo
-- Automated Testing
-
-## Current System Flow
-
-CV Skill Profile
-↓
-Job Skill Profile
-↓
-Skill Matching
-↓
-Skill Gap Analysis
-↓
-Job Ranking
-↓
-Skill Recommendation
-↓
-Learning Roadmap
-
----
-
-# Current Data Status
-
-- 340 jobs trong SQLite database.
-- 68 IT jobs được import từ Arbeitnow.
-- 67/68 Arbeitnow IT jobs có ít nhất một skill.
-- 44 skills trong database.
-- 477 quan hệ `job_skills`.
-- 5,029 CV trong resume dataset.
-- 4,293 CV có ít nhất một skill được nhận diện.
-- Full test suite: `112 passed`.
-
----
+- Full test suite hiện tại của phase: 126 passed.
 
 ## Phase 17 — CV PDF/Text Extraction
 
@@ -262,15 +201,15 @@ Learning Roadmap
 - Added document dispatcher supporting `.pdf` and `.txt`.
 - Added unit tests for extraction and error handling.
 - Added PyMuPDF to project dependencies.
-- Full test suite: 122 passed.
+- Full test suite sau phase: 122 passed.
 
-## Phase 18 — CV Upload → Recommendation
+## Phase 18 — CV Document → Recommendation Pipeline
 
-Hoàn thiện luồng:
+Hoàn thiện luồng xử lý CV document:
 
-CV PDF
+CV PDF/TXT
 ↓
-PDF/Text Extraction
+Document Extraction
 ↓
 CV Text
 ↓
@@ -286,16 +225,84 @@ Skill Gap
 ↓
 Skill Recommendation
 ↓
-Learning Roadmap
+Evaluation
 
-## Phase 19 — Final Validation
+- Kết nối CV document extraction với recommendation pipeline.
+- Hỗ trợ recommendation trực tiếp từ tập CV skills.
+- Giữ khả năng recommendation từ CV profile đã tồn tại trong database.
 
-- Kiểm thử end-to-end.
-- Kiểm tra chất lượng recommendation.
-- Kiểm tra các edge cases.
-- Đánh giá kết quả.
-- Hoàn thiện Streamlit demo.
-- Hoàn thiện documentation.
+## Phase 19 — CV Upload & Recommendation Workflow
+
+Hoàn thiện luồng upload CV trực tiếp từ giao diện:
+
+CV PDF/TXT
+↓
+Streamlit Upload
+↓
+FastAPI Upload API
+↓
+Document Extraction
+↓
+Skill Extraction
+↓
+CV Skill Profile
+↓
+Job Ranking
+↓
+Match Rate
+↓
+Matched / Missing Skills
+↓
+Skill Recommendation
+↓
+Evaluation
+↓
+Streamlit Result
+
+### API
+
+- Thêm endpoint `POST /recommendations/upload`.
+- Hỗ trợ upload CV định dạng PDF và TXT.
+- Kiểm tra định dạng file.
+- Kiểm tra file rỗng.
+- Giới hạn kích thước file 10 MB.
+- Sử dụng temporary file trong quá trình xử lý.
+- Tự động xóa temporary file sau khi request hoàn tất.
+- Giữ lại endpoint recommendation theo `cv_id` để tương thích với hệ thống hiện có.
+- Tách logic serialization recommendation thành hàm dùng chung.
+
+### Recommendation Service
+
+- Bổ sung khả năng ranking trực tiếp từ `cv_skills`.
+- Bổ sung recommendation trực tiếp từ tập skills của CV.
+- Tái sử dụng recommendation pipeline hiện có.
+- Không tạo thêm recommendation logic riêng cho upload workflow.
+
+### Streamlit
+
+- Thay CV ID input bằng chức năng upload CV.
+- Hỗ trợ PDF/TXT.
+- Hiển thị CV Skill Profile.
+- Hiển thị Top-N Job Recommendations.
+- Hiển thị Match Rate.
+- Hiển thị Matched Skills.
+- Hiển thị Missing Skills.
+- Hiển thị Skill Recommendations.
+- Hiển thị Evaluation.
+- Xử lý lỗi API, timeout và lỗi upload.
+
+### Dependencies
+
+- Thêm `python-multipart` để hỗ trợ FastAPI file upload.
+
+### Validation
+
+- Full test suite:
+
+`126 passed, 1 deselected, 1 warning`
+
+- Warning hiện tại liên quan đến deprecation giữa Starlette TestClient và httpx.
+- Warning không làm test fail.
 
 ## Phase 20 — Report
 
@@ -309,3 +316,80 @@ Learning Roadmap
 - Trình bày kết quả thực nghiệm.
 - Phân tích hạn chế.
 - Đề xuất hướng phát triển tiếp theo.
+
+---
+
+# Current Status
+
+## Core System đã hoàn thành
+
+- Database
+- Job Data Pipeline
+- Regex Skill Extraction
+- Gemini Skill Extraction
+- Hybrid Skill Extraction Pipeline
+- Skill Extraction Evaluation
+- Skill Analytics
+- Skill Gap Analysis
+- Skill Prerequisite
+- Resume Dataset Profiling
+- CV Skill Profile
+- CV → Job Matching
+- Job Ranking
+- Skill Demand Analysis
+- Skill Recommendation
+- End-to-End Recommendation Pipeline
+- Recommendation Evaluation
+- Recommendation Service
+- Job Data Acquisition
+- Arbeitnow Integration
+- FastAPI
+- Streamlit Demo
+- CV PDF/TXT Extraction
+- CV Upload
+- Automated Testing
+
+## Future Work
+
+- Learning Roadmap trong UI.
+- Cải thiện logic prerequisite và thứ tự học.
+- Các mở rộng recommendation khác.
+
+---
+
+# Current System Flow
+
+CV PDF/TXT
+↓
+Document Extraction
+↓
+Skill Extraction
+↓
+CV Skill Profile
+↓
+Job Ranking
+↓
+Skill Matching
+↓
+Skill Gap Analysis
+↓
+Match Rate
+↓
+Skill Recommendation
+↓
+Evaluation
+↓
+Streamlit UI
+
+---
+
+# Current Data Status
+
+- 340 jobs trong SQLite database.
+- 68 IT jobs được import từ Arbeitnow.
+- 67/68 Arbeitnow IT jobs có ít nhất một skill.
+- 44 skills trong database.
+- 477 quan hệ `job_skills`.
+- 5,029 CV trong resume dataset.
+- 4,293 CV có ít nhất một skill được nhận diện.
+- Full test suite hiện tại: `126 passed, 1 deselected, 1 warning`.

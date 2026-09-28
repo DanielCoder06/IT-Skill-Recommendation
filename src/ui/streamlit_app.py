@@ -13,18 +13,23 @@ st.set_page_config(
 
 
 st.title("🎯 IT Internship Recommendation")
+
 st.write(
-    "Phân tích kỹ năng và gợi ý cơ hội thực tập IT dựa trên hồ sơ kỹ năng."
+    "Phân tích CV và gợi ý cơ hội thực tập IT "
+    "dựa trên kỹ năng của ứng viên."
 )
 
 
-st.sidebar.header("CV Profile")
+# ============================================================
+# SIDEBAR
+# ============================================================
 
-cv_id = st.sidebar.number_input(
-    "CV ID",
-    min_value=1,
-    value=1,
-    step=1,
+st.sidebar.header("📄 CV Analysis")
+
+uploaded_file = st.sidebar.file_uploader(
+    "Upload CV",
+    type=["pdf", "txt"],
+    help="Chấp nhận CV định dạng PDF hoặc TXT.",
 )
 
 top_n = st.sidebar.slider(
@@ -34,140 +39,358 @@ top_n = st.sidebar.slider(
     value=5,
 )
 
+analyze_button = st.sidebar.button(
+    "🔍 Phân tích CV",
+    type="primary",
+)
 
-if st.button("🔍 Phân tích CV"):
-    endpoint = f"{API_URL}/recommendations/{cv_id}"
 
-    try:
-        response = requests.get(
-            endpoint,
-            params={"top_n": top_n},
-            timeout=10,
+# ============================================================
+# ANALYSIS
+# ============================================================
+
+if analyze_button:
+
+    if uploaded_file is None:
+        st.warning(
+            "Vui lòng upload CV trước khi phân tích."
         )
 
-        if response.status_code == 404:
-            st.error("Không tìm thấy CV.")
+    else:
 
-        elif response.status_code != 200:
-            st.error(
-                f"API trả về lỗi HTTP {response.status_code}."
+        files = {
+            "file": (
+                uploaded_file.name,
+                uploaded_file.getvalue(),
+                uploaded_file.type,
             )
+        }
 
-        else:
-            data = response.json()
+        endpoint = f"{API_URL}/recommendations/upload"
 
-            st.success(
-                f"Đã tìm thấy {data['count']} job phù hợp."
-            )
+        try:
 
-            st.subheader("📋 Job Recommendations")
-
-            for index, recommendation in enumerate(
-                data["recommendations"],
-                start=1,
+            with st.spinner(
+                "Đang đọc CV và phân tích kỹ năng..."
             ):
-                with st.expander(
-                    f"{index}. {recommendation['job_title']} "
-                    f"— {recommendation['match_rate']:.2f}%"
-                ):
-                    # ==========================================
-                    # 1. SKILL GAP
-                    # ==========================================
 
-                    col1, col2 = st.columns(2)
+                response = requests.post(
+                    endpoint,
+                    files=files,
+                    params={"top_n": top_n},
+                    timeout=120,
+                )
 
-                    with col1:
-                        st.markdown("### 🟢 Matched Skills")
+            if response.status_code == 400:
 
-                        if recommendation["matched_skills"]:
-                            for skill in recommendation["matched_skills"]:
-                                st.write(f"✓ {skill}")
-                        else:
-                            st.write("Không có skill phù hợp.")
+                detail = response.json().get(
+                    "detail",
+                    "CV không hợp lệ.",
+                )
 
-                    with col2:
-                        st.markdown("### 🔴 Missing Skills")
+                st.error(detail)
 
-                        if recommendation["missing_skills"]:
-                            for skill in recommendation["missing_skills"]:
-                                st.write(f"✗ {skill}")
-                        else:
-                            st.write("Không thiếu skill.")
+            elif response.status_code == 413:
 
-                    # ==========================================
-                    # 2. SKILL RECOMMENDATION
-                    # ==========================================
+                st.error(
+                    "CV vượt quá giới hạn dung lượng 10 MB."
+                )
 
-                    st.markdown("---")
-                    st.markdown("### 📊 Skill Recommendations")
+            elif response.status_code != 200:
 
-                    skill_recommendations = recommendation[
-                        "skill_recommendations"
-                    ]
+                detail = response.json().get(
+                    "detail",
+                    "Không thể phân tích CV.",
+                )
 
-                    if skill_recommendations:
-                        for skill_rec in skill_recommendations:
-                            skill = skill_rec["skill"]
-                            job_count = skill_rec["job_count"]
-                            percentage = skill_rec["job_percentage"]
+                st.error(
+                    f"API trả về lỗi "
+                    f"HTTP {response.status_code}: "
+                    f"{detail}"
+                )
+
+            else:
+
+                data = response.json()
+
+                # ====================================================
+                # CV INFORMATION
+                # ====================================================
+
+                st.success(
+                    f"Đã phân tích CV: "
+                    f"**{data['filename']}**"
+                )
+
+                st.subheader("👤 CV Skill Profile")
+
+                st.metric(
+                    "Tổng số kỹ năng",
+                    data["cv_skill_count"],
+                )
+
+                cv_skills = data["cv_skills"]
+
+                if cv_skills:
+
+                    skill_columns = st.columns(4)
+
+                    for index, skill in enumerate(cv_skills):
+
+                        column = skill_columns[
+                            index % len(skill_columns)
+                        ]
+
+                        with column:
+                            st.write(f"✓ {skill}")
+
+                else:
+
+                    st.warning(
+                        "Không phát hiện được kỹ năng "
+                        "trong CV."
+                    )
+
+                # ====================================================
+                # JOB RECOMMENDATIONS
+                # ====================================================
+
+                st.divider()
+
+                st.subheader(
+                    "🎯 Job Recommendations"
+                )
+
+                recommendations = data[
+                    "recommendations"
+                ]
+
+                if not recommendations:
+
+                    st.info(
+                        "Không tìm thấy job phù hợp "
+                        "với CV hiện tại."
+                    )
+
+                else:
+
+                    for index, recommendation in enumerate(
+                        recommendations,
+                        start=1,
+                    ):
+
+                        match_rate = (
+                            recommendation["match_rate"]
+                        )
+
+                        with st.expander(
+                            f"{index}. "
+                            f"{recommendation['job_title']} "
+                            f"— {match_rate:.2f}%"
+                        ):
+
+                            # ========================================
+                            # MATCH RATE
+                            # ========================================
 
                             st.markdown(
-                                f"**{skill}** — "
-                                f"{percentage:.0f}%"
+                                "### 📊 Match Rate"
                             )
 
                             st.progress(
                                 min(
                                     max(
-                                        int(percentage),
+                                        int(match_rate),
                                         0,
                                     ),
                                     100,
                                 )
                             )
 
-                            st.caption(
-                                f"Xuất hiện trong "
-                                f"{job_count} job đã được phân tích."
+                            st.write(
+                                f"**{match_rate:.2f}%**"
                             )
-                    else:
-                        st.info(
-                            "Không có dữ liệu skill recommendation."
-                        )
 
-                    # ==========================================
-                    # 3. LEARNING ROADMAP
-                    # ==========================================
+                            # ========================================
+                            # SKILL GAP
+                            # ========================================
 
-                    st.markdown("---")
-                    st.markdown("### 🗺️ Learning Roadmap")
+                            col1, col2 = st.columns(2)
 
-                    roadmap = recommendation["learning_roadmap"]
+                            with col1:
 
-                    if roadmap:
-                        st.markdown(
-                            "Thứ tự được sắp xếp từ skill nền tảng "
-                            "đến skill mục tiêu."
-                        )
+                                st.markdown(
+                                    "### 🟢 Matched Skills"
+                                )
 
-                        for index, step in enumerate(roadmap, start=1):
+                                matched_skills = (
+                                    recommendation[
+                                        "matched_skills"
+                                    ]
+                                )
+
+                                if matched_skills:
+
+                                    for skill in matched_skills:
+                                        st.write(
+                                            f"✓ {skill}"
+                                        )
+
+                                else:
+
+                                    st.write(
+                                        "Không có skill "
+                                        "phù hợp."
+                                    )
+
+                            with col2:
+
+                                st.markdown(
+                                    "### 🔴 Missing Skills"
+                                )
+
+                                missing_skills = (
+                                    recommendation[
+                                        "missing_skills"
+                                    ]
+                                )
+
+                                if missing_skills:
+
+                                    for skill in missing_skills:
+                                        st.write(
+                                            f"✗ {skill}"
+                                        )
+
+                                else:
+
+                                    st.write(
+                                        "Không thiếu skill."
+                                    )
+
+                            # ========================================
+                            # SKILL RECOMMENDATION
+                            # ========================================
+
+                            st.divider()
+
                             st.markdown(
-                                f"**Bước {index}** — {step['skill']}"
+                                "### 📚 Skill Recommendations"
                             )
 
-                    else:
-                        st.info(
-                            "Không có dữ liệu learning roadmap."
-                        )
+                            skill_recommendations = (
+                                recommendation[
+                                    "skill_recommendations"
+                                ]
+                            )
 
-    except requests.exceptions.ConnectionError:
-        st.error(
-            "Không thể kết nối FastAPI. "
-            "Hãy kiểm tra API server đang chạy ở port 8000."
-        )
+                            if skill_recommendations:
 
-    except requests.exceptions.Timeout:
-        st.error("API phản hồi quá lâu.")
+                                for skill_rec in (
+                                    skill_recommendations
+                                ):
 
-    except requests.exceptions.RequestException as error:
-        st.error(f"Lỗi khi gọi API: {error}")
+                                    skill = skill_rec[
+                                        "skill"
+                                    ]
+
+                                    job_count = (
+                                        skill_rec[
+                                            "job_count"
+                                        ]
+                                    )
+
+                                    percentage = (
+                                        skill_rec[
+                                            "job_percentage"
+                                        ]
+                                    )
+
+                                    st.markdown(
+                                        f"**{skill}** — "
+                                        f"{percentage:.0f}%"
+                                    )
+
+                                    st.progress(
+                                        min(
+                                            max(
+                                                int(
+                                                    percentage
+                                                ),
+                                                0,
+                                            ),
+                                            100,
+                                        )
+                                    )
+
+                                    st.caption(
+                                        f"Xuất hiện trong "
+                                        f"{job_count} job "
+                                        f"đã được phân tích."
+                                    )
+
+                            else:
+
+                                st.info(
+                                    "Không có dữ liệu "
+                                    "skill recommendation."
+                                )
+
+                            # ========================================
+                            # EVALUATION
+                            # ========================================
+
+                            st.divider()
+
+                            st.markdown(
+                                "### 📈 Evaluation"
+                            )
+
+                            evaluation = (
+                                recommendation[
+                                    "evaluation"
+                                ]
+                            )
+
+                            evaluation_col1, evaluation_col2 = (
+                                st.columns(2)
+                            )
+
+                            with evaluation_col1:
+
+                                st.metric(
+                                    "Matched Skills",
+                                    evaluation[
+                                        "matched_skill_count"
+                                    ],
+                                )
+
+                            with evaluation_col2:
+
+                                st.metric(
+                                    "Missing Skills",
+                                    evaluation[
+                                        "missing_skill_count"
+                                    ],
+                                )
+
+        except requests.exceptions.ConnectionError:
+
+            st.error(
+                "Không thể kết nối FastAPI. "
+                "Hãy kiểm tra API server "
+                "đang chạy ở port 8000."
+            )
+
+        except requests.exceptions.Timeout:
+
+            st.error(
+                "API phản hồi quá lâu. "
+                "Hãy thử lại với CV khác."
+            )
+
+        except requests.exceptions.RequestException as error:
+
+            st.error(
+                f"Lỗi khi gọi API: {error}"
+            )
