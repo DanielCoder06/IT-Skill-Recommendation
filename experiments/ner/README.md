@@ -866,19 +866,19 @@ python -m spacy train experiments\ner\config.cfg `
 ## Test NER
 
 ```powershell
-python experiments\ner\test_ner_v1.py
+python experiments\ner\run_ner_v1.py
 ```
 
 ## Test Hybrid
 
 ```powershell
-python experiments\ner\test_hybrid_v1.py
+python experiments\ner\run_hybrid_v1.py
 ```
 
 ## Đánh giá khả năng bổ sung
 
 ```powershell
-python experiments\ner\test_ner_supplement.py
+python experiments\ner\run_ner_supplement.py
 ```
 
 ---
