@@ -2,12 +2,14 @@
 """
 extractor_hybrid.py
 
-Kết hợp Regex/SkillMatcher và NER trong quá trình phân tích CV.
+Kết hợp Regex/SkillMatcher, NER và Local LLM
+trong quá trình phân tích CV.
 
-Kiến trúc:
+Vai trò:
 - Regex/SkillMatcher: nguồn skill đã xác nhận.
-- NER: nguồn skill đề xuất.
-- Normalizer: chuẩn hóa entity NER về canonical skill.
+- NER: nguồn skill bổ sung.
+- Local LLM: nguồn skill bổ sung.
+- Regex vẫn là baseline chính.
 """
 
 from pathlib import Path
@@ -17,11 +19,13 @@ from src.extractor.extractor_ner import (
     load_ner_model,
 )
 from src.extractor.extractor_regex import extract_skills
+from src.extractor.extractor_local_llm import (
+    extract_skills_with_local_llm,
+)
 from src.extractor.skill_normalizer import (
     create_skill_matcher,
     normalize_ner_entities,
 )
-
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 
@@ -40,21 +44,21 @@ def extract_hybrid_skills(
     model_path: str | Path = DEFAULT_MODEL_PATH,
 ) -> dict[str, set[str]]:
     """
-    Trích xuất skill bằng Regex + NER.
+    Trích xuất skill bằng Regex + NER + Local LLM.
+
+    Regex:
+        nguồn xác nhận chính.
+
+    NER + Local LLM:
+        nguồn skill bổ sung.
 
     Returns:
         {
-            "confirmed_skills": set(...),
-            "suggested_skills": set(...),
+            "confirmed_skills": set[str],
+            "suggested_skills": set[str],
         }
-
-    confirmed_skills:
-        Skill được Regex/SkillMatcher xác nhận.
-
-    suggested_skills:
-        Skill do NER nhận diện và chuẩn hóa được,
-        nhưng chưa được xác nhận là skill chính thức.
     """
+
     if not isinstance(text, str):
         raise TypeError("text phải là string.")
 
@@ -65,12 +69,12 @@ def extract_hybrid_skills(
         }
 
     # ---------------------------------------------------------
-    # 1. Regex: nguồn skill đã xác nhận
+    # 1. Regex / SkillMatcher
     # ---------------------------------------------------------
     confirmed_skills = set(extract_skills(text))
 
     # ---------------------------------------------------------
-    # 2. NER: nhận diện raw skill entities
+    # 2. NER
     # ---------------------------------------------------------
     nlp = load_ner_model(model_path)
 
@@ -79,9 +83,6 @@ def extract_hybrid_skills(
         nlp=nlp,
     )
 
-    # ---------------------------------------------------------
-    # 3. Normalize NER entities → canonical skills
-    # ---------------------------------------------------------
     matcher = create_skill_matcher()
 
     normalized_ner_skills = normalize_ner_entities(
@@ -90,9 +91,24 @@ def extract_hybrid_skills(
     )
 
     # ---------------------------------------------------------
-    # 4. Chỉ giữ NER skills chưa có trong Regex
+    # 3. Local LLM
     # ---------------------------------------------------------
-    suggested_skills = normalized_ner_skills - confirmed_skills
+    local_llm_skills = extract_skills_with_local_llm(text)
+
+    # ---------------------------------------------------------
+    # 4. Hợp nhất candidate skills
+    # ---------------------------------------------------------
+    candidate_skills = (
+        normalized_ner_skills
+        | local_llm_skills
+    )
+
+    # ---------------------------------------------------------
+    # 5. Không lặp lại skill đã được Regex xác nhận
+    # ---------------------------------------------------------
+    suggested_skills = (
+        candidate_skills - confirmed_skills
+    )
 
     return {
         "confirmed_skills": confirmed_skills,
