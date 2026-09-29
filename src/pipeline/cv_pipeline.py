@@ -2,14 +2,19 @@ from pathlib import Path
 
 from src.extractor.document_extractor import extract_text_from_document
 from src.extractor.extractor_regex import extract_skills
-from src.extractor.extractor_gemini import extract_skills_with_gemini
-from src.extractor.skill_merger import merge_skills
+
 
 def extract_cv_skills(file_path: str | Path) -> set[str]:
     """
     Extract skills from a CV document.
 
-    The document can be a PDF or TXT file.
+    Current core pipeline:
+        CV PDF/TXT
+        -> Document Extraction
+        -> Regex Skill Extraction
+
+    Gemini-based extraction is currently disabled and kept
+    as an experimental/future-work component.
 
     Args:
         file_path: Path to the CV document.
@@ -23,16 +28,4 @@ def extract_cv_skills(file_path: str | Path) -> set[str]:
     """
     cv_text = extract_text_from_document(file_path)
 
-    regex_skills = extract_skills(cv_text)
-
-    try:
-        gemini_result = extract_skills_with_gemini(cv_text)
-        gemini_skills = set(gemini_result.skills)
-    except Exception as error:
-        print(f"Gemini error: {error}")
-        gemini_skills = set()
-
-    return merge_skills(
-        regex_skills,
-        gemini_skills,
-    )
+    return extract_skills(cv_text)

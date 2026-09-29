@@ -2,7 +2,6 @@ from pathlib import Path
 
 import pymupdf
 
-from src.extractor.extractor_gemini import GeminiSkillOutput
 from src.pipeline.cv_pipeline import extract_cv_skills
 
 
@@ -17,41 +16,15 @@ def create_test_pdf(file_path: Path, text: str) -> None:
     document.close()
 
 
-def mock_gemini_skills(text: str) -> GeminiSkillOutput:
-    """
-    Mock Gemini skill extraction for unit tests.
-    """
-    return GeminiSkillOutput(
-        skills=[
-            "Python",
-            "SQL",
-            "Machine Learning",
-            "Pandas",
-            "NumPy",
-            "PostgreSQL",
-            "Git",
-            "GitHub",
-        ]
-    )
-
-
-def test_extract_cv_skills_from_pdf(
-    tmp_path: Path,
-    monkeypatch,
-) -> None:
+def test_extract_cv_skills_from_pdf(tmp_path: Path) -> None:
     pdf_path = tmp_path / "resume.pdf"
 
     cv_text = """
     Data Analyst with experience in Python, SQL and Machine Learning.
-    Used Pandas, NumPy, PostgreSQL, Git and GitHub.
+    Used PostgreSQL, Git and GitHub.
     """
 
     create_test_pdf(pdf_path, cv_text)
-
-    monkeypatch.setattr(
-        "src.pipeline.cv_pipeline.extract_skills_with_gemini",
-        mock_gemini_skills,
-    )
 
     skills = extract_cv_skills(pdf_path)
 
@@ -59,8 +32,6 @@ def test_extract_cv_skills_from_pdf(
         "Python",
         "SQL",
         "Machine Learning",
-        "Pandas",
-        "NumPy",
         "PostgreSQL",
         "Git",
         "GitHub",
@@ -69,10 +40,7 @@ def test_extract_cv_skills_from_pdf(
     assert expected_skills.issubset(skills)
 
 
-def test_extract_cv_skills_from_txt(
-    tmp_path: Path,
-    monkeypatch,
-) -> None:
+def test_extract_cv_skills_from_txt(tmp_path: Path) -> None:
     txt_path = tmp_path / "resume.txt"
 
     txt_path.write_text(
@@ -81,11 +49,6 @@ def test_extract_cv_skills_from_txt(
         Git and Machine Learning.
         """,
         encoding="utf-8",
-    )
-
-    monkeypatch.setattr(
-        "src.pipeline.cv_pipeline.extract_skills_with_gemini",
-        mock_gemini_skills,
     )
 
     skills = extract_cv_skills(txt_path)

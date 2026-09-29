@@ -85,6 +85,7 @@ def extract_skills_with_gemini(text: str) -> GeminiSkillOutput:
         "mime_type": "application/json",
         "schema": GeminiSkillOutput.model_json_schema(),
         },
+        timeout=15_000,
     )
 
     return GeminiSkillOutput.model_validate_json(
