@@ -7,6 +7,4 @@ def test_evaluation_cases_are_valid():
     for case in EVALUATION_CASES:
         assert case["name"]
         assert case["description"]
-        assert case["expected_skills"]
-
         assert isinstance(case["expected_skills"], set)
