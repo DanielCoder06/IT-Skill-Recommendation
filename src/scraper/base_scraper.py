@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 
-from src.scraper.job_schema import JobRecord
+from src.models.raw_job import RawJob
 
 
 class BaseScraper(ABC):
 
     @abstractmethod
-    def scrape(self, url: str) -> list[JobRecord]:
-        """Scrape jobs from a source URL."""
+    def scrape(self, url: str) -> list[RawJob]:
+        """Scrape raw jobs from a source."""
         raise NotImplementedError
