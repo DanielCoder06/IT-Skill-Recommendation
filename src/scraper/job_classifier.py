@@ -37,6 +37,7 @@ SENIOR_KEYWORDS = {
     "vice president",
 }
 
+
 def contains_keyword(
     text: str,
     keywords: set[str],
@@ -49,7 +50,13 @@ def contains_keyword(
 
 def classify_job_level(job: JobRecord) -> str:
     """
-    Classify job level based primarily on the job title.
+    Classify job level using both source-provided experience
+    and the job title.
+
+    Priority:
+        1. experience field
+        2. job title
+        3. unspecified
 
     Returns:
         internship
@@ -57,15 +64,56 @@ def classify_job_level(job: JobRecord) -> str:
         senior
         unspecified
     """
-    title = job.title.lower()
 
-    if contains_keyword(title, SENIOR_KEYWORDS):
-        return "senior"
+    title = job.title.lower().strip()
+    experience = job.experience.lower().strip()
 
-    if contains_keyword(title, INTERNSHIP_KEYWORDS):
+    # ---------------------------------------------------------
+    # 1. Use source-provided experience first
+    # ---------------------------------------------------------
+
+    if contains_keyword(
+        experience,
+        INTERNSHIP_KEYWORDS,
+    ):
         return "internship"
 
-    if contains_keyword(title, JUNIOR_KEYWORDS):
+    if contains_keyword(
+        experience,
+        JUNIOR_KEYWORDS,
+    ):
         return "junior"
+
+    if contains_keyword(
+        experience,
+        SENIOR_KEYWORDS,
+    ):
+        return "senior"
+
+    # ---------------------------------------------------------
+    # 2. Fall back to title classification
+    # ---------------------------------------------------------
+
+    if contains_keyword(
+        title,
+        SENIOR_KEYWORDS,
+    ):
+        return "senior"
+
+    if contains_keyword(
+        title,
+        INTERNSHIP_KEYWORDS,
+    ):
+        return "internship"
+
+    if contains_keyword(
+        title,
+        JUNIOR_KEYWORDS,
+    ):
+        return "junior"
+
+    # ---------------------------------------------------------
+    # 3. Unknown level
+    # ---------------------------------------------------------
 
     return "unspecified"
