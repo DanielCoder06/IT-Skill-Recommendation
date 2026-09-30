@@ -55,10 +55,10 @@ def test_get_skill_sources():
     )
 
     assert result == {
-        "Python": "both",
-        "SQL": "both",
+        "Python": "regex",
+        "SQL": "regex",
         "Git": "regex",
-        "Pandas": "gemini",
+        "Pandas": "supplementary",
     }
 
 
@@ -85,6 +85,6 @@ def test_get_skill_sources_with_empty_regex():
     )
 
     assert result == {
-        "Python": "gemini",
-        "SQL": "gemini",
+        "Python": "supplementary",
+        "SQL": "supplementary",
     }

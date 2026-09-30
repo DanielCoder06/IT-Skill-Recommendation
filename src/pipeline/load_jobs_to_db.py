@@ -65,51 +65,11 @@ def get_or_create_location(
 
     return cursor.lastrowid
 
-
-def save_job_skills(
-    connection: sqlite3.Connection,
-    job_id: int,
-    skills: list[str],
-) -> None:
-    for skill_name in skills:
-        result = connection.execute(
-            """
-            SELECT id
-            FROM skills
-            WHERE name = ?
-            """,
-            (skill_name,),
-        )
-
-        skill = result.fetchone()
-
-        if skill is None:
-            continue
-
-        skill_id = skill[0]
-
-        connection.execute(
-            """
-            INSERT INTO job_skills (
-                job_id,
-                skill_id,
-                source
-            )
-            VALUES (?, ?, ?)
-            ON CONFLICT(job_id, skill_id)
-            DO UPDATE SET source = excluded.source
-            """,
-            (
-                job_id,
-                skill_id,
-                "regex",
-            ),
-        )
-
-
 def save_jobs_to_db(
     jobs: list[JobRecord],
-) -> None:
+) -> dict[str, int]:
+    job_ids: dict[str, int] = {}
+    job_ids[job.url] = job_id
     connection = sqlite3.connect(DB_PATH)
 
     print("Số lượng jobs:", len(jobs))
@@ -201,6 +161,7 @@ def save_jobs_to_db(
 
     connection.commit()
     connection.close()
+    return job_ids
 
 
 def load_jobs_to_db() -> None:

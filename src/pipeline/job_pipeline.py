@@ -1,54 +1,78 @@
 from src.pipeline.load_jobs import load_jobs
-from src.extractor.extractor_regex import extract_skills, save_job_skills
-from src.extractor.extractor_gemini import extract_skills_with_gemini
-from src.extractor.skill_merger import merge_skills, get_skill_sources
+from src.pipeline.load_jobs_to_db import save_jobs_to_db
+from src.scraper.job_schema import JobRecord
+
+from src.extractor.extractor_hybrid import extract_hybrid_skills
+from src.extractor.skill_merger import (
+    merge_skills,
+    get_skill_sources,
+)
+from src.extractor.extractor_regex import save_job_skills
 
 
-def run_pipeline():
-    jobs = load_jobs()
+def build_job_records() -> list[JobRecord]:
+    raw_jobs = load_jobs()
+
+    return [
+        JobRecord(
+            title=job["title"],
+            company=job["company_name"],
+            description=job["description"],
+            location=job["location"],
+            url=job["url"],
+            experience=job.get("experience", ""),
+            skills=job.get("skills", []),
+        )
+        for job in raw_jobs
+    ]
+
+
+def run_pipeline() -> None:
+    jobs = build_job_records()
+
+    job_ids = save_jobs_to_db(jobs)
 
     for job in jobs:
-        title = job["title"]
-        description = job["description"]
+        job_id = job_ids.get(job.url)
 
-        # 1. Extract skills bằng Regex
-        regex_skills = extract_skills(description)
+        if job_id is None:
+            print(f"Không tìm thấy job_id: {job.url}")
+            continue
 
-        # 2. Extract skills bằng Gemini
-        try:
-            gemini_result = extract_skills_with_gemini(description)
-            gemini_skills = set(gemini_result.skills)
-        except Exception as error:
-            print(f"Gemini error: {error}")
-            gemini_skills = set()
+        hybrid_result = extract_hybrid_skills(
+            job.description
+        )
 
-        # 3. Merge hai kết quả
+        confirmed_skills = hybrid_result[
+            "confirmed_skills"
+        ]
+
+        suggested_skills = hybrid_result[
+            "suggested_skills"
+        ]
+
         final_skills = merge_skills(
-            regex_skills,
-            gemini_skills,
+            confirmed_skills,
+            suggested_skills,
         )
 
-        # 4. Xác định nguồn của từng skill
         skill_sources = get_skill_sources(
-            regex_skills,
-            gemini_skills,
+            confirmed_skills,
+            suggested_skills,
         )
 
-        # 5. Lưu skill và source vào database
         save_job_skills(
-            job["id"],
+            job_id,
             skill_sources,
         )
 
-        # 6. Hiển thị kết quả
-        print(f"\nJob: {title}")
-
-        print("Regex:")
-        for skill in sorted(regex_skills):
+        print(f"\nJob: {job.title}")
+        print("Confirmed:")
+        for skill in sorted(confirmed_skills):
             print(f"- {skill}")
 
-        print("Gemini:")
-        for skill in sorted(gemini_skills):
+        print("Suggested:")
+        for skill in sorted(suggested_skills):
             print(f"- {skill}")
 
         print("Final:")
