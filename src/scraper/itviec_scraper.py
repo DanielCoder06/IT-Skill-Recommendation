@@ -1,11 +1,12 @@
+from dataclasses import replace
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
+import requests
 from bs4 import BeautifulSoup
 
 from src.models.raw_job import RawJob
 from src.scraper.base_scraper import BaseScraper
-
 
 class ITviecScraper(BaseScraper):
     def scrape(
@@ -113,6 +114,83 @@ class ITviecScraper(BaseScraper):
             unique_jobs[job_url] = raw_job
 
         return list(unique_jobs.values())
+
+    @staticmethod
+    def _fetch_detail_html(url: str) -> str:
+        response = requests.get(
+            url,
+            timeout=20,
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 "
+                    "(Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 "
+                    "(KHTML, like Gecko) "
+                    "Chrome/140.0 Safari/537.36"
+                )
+            },
+        )
+
+        response.raise_for_status()
+
+        return response.text
+
+    @staticmethod
+    def _extract_detail_description(
+        html: str,
+    ) -> str:
+        soup = BeautifulSoup(
+            html,
+            "html.parser",
+        )
+
+        sections = []
+
+        for heading_text in [
+            "Mô tả công việc",
+            "Yêu cầu công việc",
+        ]:
+            heading = soup.find(
+                "h2",
+                string=lambda text: (
+                    text
+                    and text.strip()
+                    == heading_text
+                ),
+            )
+
+            if heading is None:
+                continue
+
+            parent = heading.parent
+
+            text = parent.get_text(
+                "\n",
+                strip=True,
+            )
+
+            if text:
+                sections.append(text)
+
+        return "\n\n".join(sections)
+
+    @classmethod
+    def enrich_job_detail(
+        cls,
+        job: RawJob,
+    ) -> RawJob:
+        html = cls._fetch_detail_html(
+            job.job_url
+        )
+
+        description = cls._extract_detail_description(
+            html
+        )
+
+        return replace(
+            job,
+            description=description,
+        )
 
     @staticmethod
     def _load_html(path: str) -> str:
