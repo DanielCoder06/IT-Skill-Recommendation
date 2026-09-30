@@ -1,4 +1,6 @@
+import json
 import sys
+import time
 from pathlib import Path
 
 sys.path.insert(
@@ -9,109 +11,174 @@ sys.path.insert(
 from src.scraper.itviec_scraper import ITviecScraper
 from src.scraper.job_filter import is_it_job
 from src.scraper.job_schema import JobRecord
-from src.scraper.target_job_filter import filter_target_internships
 
+
+BASE_DIR = Path(__file__).resolve().parents[1]
 
 LISTING_PATH = (
-    Path(__file__).resolve().parents[1]
+    BASE_DIR
     / "data"
     / "external"
     / "itviec"
     / "Việc làm AI, Data.html"
 )
 
-BATCH_SIZE = 5
+OUTPUT_PATH = (
+    BASE_DIR
+    / "data"
+    / "external"
+    / "itviec"
+    / "it_jobs_enriched.json"
+)
+
+DELAY_SECONDS = 1.0
+
+
+def is_itviec_job(job) -> bool:
+    job_record = JobRecord(
+        title=job.title,
+        company=job.company or "",
+        description=job.description or "",
+        location=job.location or "",
+        url=job.job_url,
+        experience=job.experience or "",
+    )
+
+    return is_it_job(job_record)
+
+
+def raw_job_to_dict(job) -> dict:
+    return {
+        "source": job.source,
+        "external_id": job.external_id,
+        "title": job.title,
+        "company": job.company,
+        "location": job.location,
+        "description": job.description,
+        "job_url": job.job_url,
+        "posted_date": (
+            job.posted_date.isoformat()
+            if job.posted_date
+            else None
+        ),
+        "employment_type": job.employment_type,
+        "experience": job.experience,
+        "remote": job.remote,
+        "tags": job.tags,
+        "raw_data": job.raw_data,
+    }
 
 
 def main() -> None:
-    print("=== ITVIEC DETAIL ENRICHMENT BATCH TEST ===")
-
     scraper = ITviecScraper()
 
-    jobs = scraper.scrape(str(LISTING_PATH))
+    print("=== ITVIEC FULL DETAIL ENRICHMENT ===")
 
-    print("Listing jobs:", len(jobs))
+    jobs = scraper.scrape(str(LISTING_PATH))
 
     it_jobs = [
         job
         for job in jobs
-        if is_it_job(
-            JobRecord(
-                title=job.title,
-                company=job.company or "Unknown",
-                description=job.description,
-                location=job.location or "Unknown",
-                url=job.job_url,
-                experience="",
-            )
-        )
+        if is_itviec_job(job)
     ]
 
-    print("IT jobs:", len(it_jobs))
-
-    batch = it_jobs[:BATCH_SIZE]
-
-    print("Batch size:", len(batch))
+    print(f"Listing jobs: {len(jobs)}")
+    print(f"IT jobs: {len(it_jobs)}")
     print()
-
-    success = 0
-    empty = 0
-    failed = 0
 
     enriched_jobs = []
 
-    for index, job in enumerate(batch, start=1):
+    success_count = 0
+    empty_count = 0
+    failed_count = 0
+
+    failures = []
+
+    for index, job in enumerate(it_jobs, start=1):
         print(
-            f"[{index}/{len(batch)}] "
+            f"[{index}/{len(it_jobs)}] "
             f"{job.title}"
         )
 
         try:
-            enriched_job = scraper.enrich_job_detail(
-                job
-            )
+            enriched_job = scraper.enrich_job_detail(job)
 
             description_length = len(
                 enriched_job.description
             )
 
             print(
-                "  Description length:",
-                description_length,
+                f"  Description length: "
+                f"{description_length}"
             )
 
-            if description_length == 0:
-                empty += 1
+            if not enriched_job.description.strip():
+                empty_count += 1
                 print("  RESULT: EMPTY")
             else:
-                success += 1
-                enriched_jobs.append(
-                    enriched_job
-                )
+                success_count += 1
                 print("  RESULT: SUCCESS")
 
+            enriched_jobs.append(
+                raw_job_to_dict(enriched_job)
+            )
+
         except Exception as exc:
-            failed += 1
+            failed_count += 1
+
             print(
-                "  RESULT: FAILED"
-            )
-            print(
-                "  Error:",
-                type(exc).__name__,
-                str(exc),
+                f"  RESULT: FAILED - {exc}"
             )
 
-        print()
+            failures.append(
+                {
+                    "title": job.title,
+                    "url": job.job_url,
+                    "error": str(exc),
+                }
+            )
 
+        if index < len(it_jobs):
+            time.sleep(DELAY_SECONDS)
+
+    output = {
+        "source": "itviec",
+        "total_listing_jobs": len(jobs),
+        "total_it_jobs": len(it_jobs),
+        "success": success_count,
+        "empty": empty_count,
+        "failed": failed_count,
+        "failures": failures,
+        "jobs": enriched_jobs,
+    }
+
+    OUTPUT_PATH.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    with OUTPUT_PATH.open(
+        "w",
+        encoding="utf-8",
+    ) as file:
+        json.dump(
+            output,
+            file,
+            ensure_ascii=False,
+            indent=2,
+        )
+
+    print()
     print("=== SUMMARY ===")
-    print("Total:", len(batch))
-    print("Success:", success)
-    print("Empty:", empty)
-    print("Failed:", failed)
+    print(f"Total IT jobs: {len(it_jobs)}")
+    print(f"Success: {success_count}")
+    print(f"Empty: {empty_count}")
+    print(f"Failed: {failed_count}")
 
-    if enriched_jobs:
-        print("\n=== FIRST JOB PREVIEW ===")
-        print(enriched_jobs[0].description[:1000])
+    print()
+    print(
+        f"Saved to: {OUTPUT_PATH}"
+    )
 
 
 if __name__ == "__main__":
