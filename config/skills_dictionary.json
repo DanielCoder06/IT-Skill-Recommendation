@@ -46,7 +46,7 @@
 
   "Git": {
     "category": "Version Control",
-    "aliases": ["git", "version control"]
+    "aliases": ["git"]
   },
 
   "GitHub": {
@@ -101,7 +101,7 @@
 
   "REST API": {
     "category": "Backend",
-    "aliases": ["rest api", "restful api", "rest", "api"]
+    "aliases": ["rest api", "restful api", "rest"]
   },
 
   "HTML": {
@@ -131,7 +131,7 @@
 
   "Docker": {
     "category": "DevOps",
-    "aliases": ["docker", "docker container", "containers"]
+    "aliases": ["docker", "docker container", "docker containers"]
   },
 
   "Linux": {
@@ -214,13 +214,7 @@
 
   "Teamwork": {
     "category": "Soft Skill",
-    "aliases": [
-      "teamwork",
-      "team work",
-      "team player",
-      "team collaboration",
-      "làm việc nhóm"
-    ]
+    "aliases": ["teamwork", "team work", "team collaboration", "làm việc nhóm"]
   },
 
   "Problem Solving": {
