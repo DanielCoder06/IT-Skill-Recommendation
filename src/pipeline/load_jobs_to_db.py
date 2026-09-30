@@ -65,11 +65,12 @@ def get_or_create_location(
 
     return cursor.lastrowid
 
+
 def save_jobs_to_db(
     jobs: list[JobRecord],
 ) -> dict[str, int]:
     job_ids: dict[str, int] = {}
-    job_ids[job.url] = job_id
+
     connection = sqlite3.connect(DB_PATH)
 
     print("Số lượng jobs:", len(jobs))
@@ -153,14 +154,11 @@ def save_jobs_to_db(
 
             print("UPDATE:", job.title)
 
-        save_job_skills(
-            connection,
-            job_id,
-            job.skills,
-        )
+        job_ids[job.url] = job_id
 
     connection.commit()
     connection.close()
+
     return job_ids
 
 
